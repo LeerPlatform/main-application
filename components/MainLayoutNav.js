@@ -10,17 +10,18 @@ export default function MainLayoutNav({ children }) {
             <div class="flex items-center">
 
               <a class="flex flex-row items-center pr-3">
-                <img src="~/assets/img/logo-icon-transparent-150x144.png" class="h-12" alt="Leer Platform Logo">
+                <img src="/images/logo-icon-transparent-150x144.png" class="h-12" alt="Leer Platform Logo" />
               </a>
 
               <a class="flex flex-row items-center px-3 py-2 font-medium rounded-md hover:text-gray-600 focus:outline-none focus:text-gray-800">
-                {{ $t('BrandDefault.nav.catalog') }}
+                Catalog
               </a>
 
               <a class="flex flex-row items-center px-3 py-2 font-medium rounded-md hover:text-gray-600 focus:outline-none focus:text-gray-800">
-                {{ $t('BrandDefault.nav.topics') }}
+                Topics
               </a>
 
+            </div>
           </div>
         </div>
 
