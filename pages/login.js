@@ -1,13 +1,13 @@
 import MainLayout from '../components/MainLayout'
 
-function Home() {
+function Login() {
   return (
     <MainLayout>
       <div className="container mx-auto">
-        <div className="text-2xl">Homepage</div>
+        <div className="text-2xl">Login</div>
       </div>
     </MainLayout>
   )
 }
 
-export default Home
+export default Login
