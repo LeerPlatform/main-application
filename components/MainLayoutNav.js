@@ -3,7 +3,7 @@ import Link from 'next/link'
 export default function MainLayoutNav({ children }) {
   return (
     <nav className="bg-white shadow relative z-40 border-t-4 border-purple-600">
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-4">
 
         <div className="flex items-center justify-between h-20">
           <div className="flex-shrink-0">
