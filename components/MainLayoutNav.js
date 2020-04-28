@@ -27,6 +27,12 @@ export default function MainLayoutNav({ children }) {
                 </a>
               </Link>
 
+              <Link href="/topics">
+                <a className="flex flex-row items-center px-3 py-2 font-medium rounded-md hover:text-gray-600 focus:outline-none focus:text-gray-800">
+                  Leaderbord
+                </a>
+              </Link>
+
             </div>
           </div>
 
