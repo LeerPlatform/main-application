@@ -17,17 +17,23 @@ export default function MainLayoutNav({ children }) {
 
               <Link href="/catalog">
                 <a className="flex flex-row items-center px-3 py-2 font-medium rounded-md hover:text-gray-600 focus:outline-none focus:text-gray-800">
-                  Catalog
+                  Catalogus
                 </a>
               </Link>
 
               <Link href="/topics">
                 <a className="flex flex-row items-center px-3 py-2 font-medium rounded-md hover:text-gray-600 focus:outline-none focus:text-gray-800">
-                  Topics
+                  Onderwerpen
                 </a>
               </Link>
 
-              <Link href="/topics">
+              <Link href="/news">
+                <a className="flex flex-row items-center px-3 py-2 font-medium rounded-md hover:text-gray-600 focus:outline-none focus:text-gray-800">
+                  Nieuws
+                </a>
+              </Link>
+
+              <Link href="/leaderbord">
                 <a className="flex flex-row items-center px-3 py-2 font-medium rounded-md hover:text-gray-600 focus:outline-none focus:text-gray-800">
                   Leaderbord
                 </a>
