@@ -31,8 +31,8 @@ function Home({ chunkedPopularTopics }) {
               {topicChunk.map(topic => (
                 <div className="w-1/3 px-2 mb-2">
                   <Link href="/test">
-                    <a className="flex px-3 py-3 bg-white hover:bg-gray-100 border shadow rounded">
-                      <span className="font-medium">{topic.display_name}</span>
+                    <a className="block px-3 py-3 bg-white hover:bg-gray-100 border shadow rounded-full font-medium text-center">
+                      {topic.display_name}
                     </a>
                   </Link>
                 </div>
