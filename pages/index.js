@@ -68,8 +68,13 @@ function Home({ chunkedPopularTopics, chunkedPopularCourses }) {
                       <img src="https://picsum.photos/id/203/320/180"/>
                     </div>
 
+
                     <div className="px-4 py-3">
-                      <h2 className="font-medium text-lg text-purple-800 mb-2">{ course.title }</h2>
+                      <h2 className="font-medium text-lg mb-2">
+                        <Link href="test">
+                          <a className="hover:text-purple-600">{course.title}</a>
+                        </Link>
+                      </h2>
                       <p className="text-sm leading-snug">{ course.description_excerpt }</p>
                     </div>
 
