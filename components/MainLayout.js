@@ -4,7 +4,7 @@ import MainLayoutFooter from './MainLayoutFooter'
 
 export default function MainLayout({ children }) {
     return (
-      <div className="font-body text-gray-900 leading-normal">
+      <div className="font-body bg-gray-100 text-gray-900 leading-normal">
 
         <MainLayoutNav />
 
