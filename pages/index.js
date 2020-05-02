@@ -71,7 +71,7 @@ function Home({ chunkedPopularTopics, chunkedPopularCourses }) {
 
                     <div className="px-4 py-3">
                       <h2 className="font-medium text-lg mb-2">
-                        <Link href="test">
+                        <Link href="/courses/[course]" as={`/courses/${course.slug}`}>
                           <a className="hover:text-purple-600">{course.title}</a>
                         </Link>
                       </h2>
