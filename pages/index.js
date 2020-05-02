@@ -34,7 +34,7 @@ function Home({ chunkedPopularTopics, chunkedPopularCourses }) {
             <div className="flex -mx-2" key={index.toString()}>
               {topicChunk.map(topic => (
                 <div className="w-1/3 px-2 mb-2" key={topic.id.toString()}>
-                  <Link href="/test">
+                  <Link href="/topics/[topic]" as={`/topics/${topic.slug}`}>
                     <a className="block px-3 py-3 bg-white hover:bg-gray-100 border shadow rounded-full font-medium text-center">
                       {topic.display_name}
                     </a>
