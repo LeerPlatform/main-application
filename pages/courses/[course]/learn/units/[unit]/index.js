@@ -14,4 +14,12 @@ function CourseDetails() {
   )
 }
 
+export async function getStaticProps(context) {
+  return {
+    props: {
+      namespacesRequired: ['common'],
+    },
+  }
+}
+
 export default CourseDetails

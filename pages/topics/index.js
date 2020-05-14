@@ -10,4 +10,12 @@ function Topics() {
   )
 }
 
+export async function getStaticProps(context) {
+  return {
+    props: {
+      namespacesRequired: ['common'],
+    },
+  }
+}
+
 export default Topics

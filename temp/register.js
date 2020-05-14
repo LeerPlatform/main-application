@@ -10,4 +10,12 @@ function Register() {
   )
 }
 
+export async function getStaticProps(context) {
+  return {
+    props: {
+      namespacesRequired: ['common'],
+    },
+  }
+}
+
 export default Register

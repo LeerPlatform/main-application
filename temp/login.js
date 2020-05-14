@@ -1,4 +1,5 @@
 import MainLayout from '../components/MainLayout'
+import { withTranslation } from '../i18n'
 
 function Login() {
   return (
@@ -33,4 +34,12 @@ function Login() {
   )
 }
 
-export default Login
+export async function getStaticProps(context) {
+  return {
+    props: {
+      namespacesRequired: ['common'],
+    },
+  }
+}
+
+export default withTranslation('common')(Login)
