@@ -1,7 +1,7 @@
 import MainLayout from '../components/MainLayout'
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import fetch from 'isomorphic-unfetch'
-import { login } from '../utils/auth'
+import { setUserToken } from '../lib/auth'
 import Router from 'next/router'
 
 const handleLogin = async (email, password) => {
@@ -16,23 +16,12 @@ const handleLogin = async (email, password) => {
   }
 
   const { token } = await loginResponse.json()
-  login({ token })
-
-  const currentUserResponse = await fetch('http://api.leer-platform.test/v1/auth/user/current', {
-    method: 'GET',
-    headers: {
-      'Authorization': 'Bearer ' + token,
-    },
-  })
-
-  const { data } = await currentUserResponse.json();
-
-  // Store user in context
+  setUserToken(token)
 
   Router.push('/authenticated')
 }
 
-function Login() {
+function Login({ cxt }) {
   const [userData, setUserData] = useState({
     email: 'cyril@example.com',
     password: 'secret',

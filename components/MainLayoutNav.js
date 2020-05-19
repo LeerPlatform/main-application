@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { auth, logout } from '../utils/auth'
+import { auth, logout } from '../lib/auth'
 
 export default function MainLayoutNav({ children }) {
   return (
