@@ -1,4 +1,4 @@
-export default function MainLayoutFooter({ children }) {
+export default function SiteFooter({ children }) {
   return (
     <footer>
       <div className="mt-4 border-t border-gray-400 flex flex-col items-center">
