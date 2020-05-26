@@ -75,7 +75,7 @@ function Home({ chunkedPopularTopics, chunkedPopularCourses }) {
                           <a className="hover:text-purple-600">{course.title.nl}</a>
                         </Link>
                       </h2>
-                      <p className="text-sm leading-snug">{course.nldescription_excerpt.nl}</p>
+                      <p className="text-sm leading-snug">{course.description_excerpt.nl}</p>
                     </div>
 
                     <div className="px-4">
@@ -120,6 +120,9 @@ export async function getStaticProps() {
       'page[size]': 6,
     },
   })
+
+  console.log(popularCourses);
+
 
   return {
     props: {
