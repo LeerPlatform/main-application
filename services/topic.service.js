@@ -1,4 +1,4 @@
-import Request from '../helpers/request'
+import Request from '../helpers/http'
 
 async function getAll({ params }) {
   const defaultParams = {
