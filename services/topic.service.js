@@ -1,11 +1,11 @@
-import Request from '../helpers/http'
+import Http from '../helpers/http'
 
 async function getAll({ params }) {
   const defaultParams = {
     method: 'GET',
   }
 
-  return await Request.get('topics')
+  return await Http.get('topics')
 }
 
 export const topicService = {
