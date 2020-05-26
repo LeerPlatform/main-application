@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import Link from 'next/link'
-import onClickOutside from 'react-onclickoutside'
 import OutsideClickHandler from 'react-outside-click-handler'
 
 function SiteHeader() {
