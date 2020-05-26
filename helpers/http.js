@@ -3,7 +3,7 @@ import fetch from 'isomorphic-fetch'
 const _apiHost = 'http://api.leer-platform.test'
 const _apiVersion = 'v1'
 
-async function request(url, params, method) {
+async function request(url, params, method = 'GET') {
   const options = {
     method,
     headers: {
