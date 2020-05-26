@@ -8,6 +8,9 @@ module.exports = {
       colors: {
         'primary-blue': '#1089ff',
       },
+      minHeight: {
+        '20': '5rem',
+      }
     },
   },
   variants: {},
