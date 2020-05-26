@@ -1,7 +1,7 @@
 import MainLayout from '../components/MainLayout'
 import Link from 'next/link'
-import { getPopularTopics } from '../lib/topics'
-import { getPopularCourses } from '../lib/courses'
+import { courseService } from '../services'
+import { topicService } from '../services'
 import _ from 'lodash'
 
 function Home({ chunkedPopularTopics, chunkedPopularCourses }) {
@@ -36,7 +36,7 @@ function Home({ chunkedPopularTopics, chunkedPopularCourses }) {
                 <div className="w-1/3 px-2 mb-2" key={topic.id.toString()}>
                   <Link href="/topics/[topic]" as={`/topics/${topic.slug}`}>
                     <a className="block px-3 py-3 bg-white hover:bg-gray-100 border shadow rounded-full font-medium text-center">
-                      {topic.display_name}
+                      {topic.display_name.nl}
                     </a>
                   </Link>
                 </div>
@@ -72,16 +72,16 @@ function Home({ chunkedPopularTopics, chunkedPopularCourses }) {
                     <div className="px-4 py-3">
                       <h2 className="font-medium text-lg mb-2">
                         <Link href="/courses/[course]" as={`/courses/${course.slug}`}>
-                          <a className="hover:text-purple-600">{course.title}</a>
+                          <a className="hover:text-purple-600">{course.title.nl}</a>
                         </Link>
                       </h2>
-                      <p className="text-sm leading-snug">{ course.description_excerpt }</p>
+                      <p className="text-sm leading-snug">{course.nldescription_excerpt.nl}</p>
                     </div>
 
                     <div className="px-4">
                       {course.tags.map(tag => (
                         <Link href="/test" key={tag.id.toString()}>
-                          <a className="text-xs font-medium">{ tag.name.en }</a>
+                          <a className="text-xs font-medium">{ tag.name.nl }</a>
                         </Link>
                       ))}
                     </div>
@@ -107,8 +107,19 @@ function Home({ chunkedPopularTopics, chunkedPopularCourses }) {
 }
 
 export async function getStaticProps() {
-  const popularTopics = await getPopularTopics()
-  const popularCourses = await getPopularCourses()
+  const popularTopics = await topicService.getAll({
+    params: {
+      'sort': '-popular',
+      'page[size]': 6,
+    },
+  })
+  const popularCourses = await courseService.getAll({
+    params: {
+      'include': ['tags'],
+      'sort': '-popular',
+      'page[size]': 6,
+    },
+  })
 
   return {
     props: {
