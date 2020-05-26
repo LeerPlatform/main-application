@@ -2,6 +2,8 @@
 
 > Online courses platform
 
+![leer-platform test 3000](https://user-images.githubusercontent.com/16477999/82945512-5d2af680-9f9d-11ea-9a43-0495fa7ac2f3.png)
+
 ## Overview
 
 This repository contains the main web application of the Leer Platform.
