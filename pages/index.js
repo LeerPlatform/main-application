@@ -25,7 +25,7 @@ function Home({ chunkedPopularTopics, chunkedPopularCourses }) {
             <div className="flex items-end justify-between">
               <h2 className="text-xl font-bold">Verken aanbevolen cursussen</h2>
               <Link href="/catalog">
-                <a className="text-sm">Bekijk de catalogus<span>&raquo;</span></a>
+                <a className="text-sm hover:text-primary-blue">Bekijk de catalogus <span>&raquo;</span></a>
               </Link>
             </div>
           </div>
@@ -38,7 +38,6 @@ function Home({ chunkedPopularTopics, chunkedPopularCourses }) {
                     <div className="overflow-hidden rounded-t">
                       <img src="https://picsum.photos/id/203/320/180" />
                     </div>
-
 
                     <div className="px-4 py-3">
                       <h2 className="font-medium text-lg mb-2">
@@ -56,16 +55,7 @@ function Home({ chunkedPopularTopics, chunkedPopularCourses }) {
                         </Link>
                       ))}
                     </div>
-
-                    <div></div>
                   </div>
-
-
-                  {/* <Link href="/test">
-                    <a className="block px-3 py-3 bg-white hover:bg-gray-100 border shadow rounded-full font-medium text-center">
-                      {topic.display_name}
-                    </a>
-                  </Link> */}
                 </div>
               ))}
             </div>
@@ -81,7 +71,7 @@ function Home({ chunkedPopularTopics, chunkedPopularCourses }) {
             <div className="flex items-end justify-between">
               <h2 className="text-xl font-bold">Top-onderwerpen</h2>
               <Link href="/topics">
-                <a className="text-sm">Bekijk alles <span>&raquo;</span></a>
+                <a className="text-sm hover:text-primary-blue">Bekijk alles <span>&raquo;</span></a>
               </Link>
             </div>
           </div>
@@ -155,9 +145,6 @@ export async function getStaticProps() {
       'page[size]': 6,
     },
   })
-
-  console.log(popularCourses);
-
 
   return {
     props: {
