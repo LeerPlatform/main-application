@@ -31,14 +31,14 @@ function Home({ chunkedPopularTopics, chunkedPopularCourses }) {
           </div>
 
           {chunkedPopularCourses.map((courseChunk, index) => (
-            <div className="flex -mx-2" key={index.toString()}>
+            <div className="flex flex-wrap -mx-2" key={index.toString()}>
               {courseChunk.map(course => (
-                <div className="w-1/4 px-2 mb-2 flex items-stretch" key={course.id.toString()}>
+                <div className="flex items-stretch w-full sm:w-1/2 lg:w-1/4 px-2 mb-4" key={course.id.toString()}>
                   <div className="flex flex-col flex-grow bg-white border shadow-sm rounded-lg group">
                     <div className="overflow-hidden rounded-t-lg">
                       <Link href="/courses/[course]" as={`/courses/${course.slug}`}>
                         <a className="hover:text-primary-blue">
-                          <img src="https://picsum.photos/id/203/320/180" className="group-hover:filter-brightness-80 transition-filter ease-out duration-500" />
+                          <img src="https://picsum.photos/id/203/320/180" className="w-full group-hover:filter-brightness-80 transition-filter ease-out duration-500" />
                         </a>
                       </Link>
                     </div>
