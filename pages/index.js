@@ -13,7 +13,7 @@ function Home({ chunkedPopularTopics, chunkedPopularCourses }) {
           <p className="text-lg mb-8">Leer, ontdek en ontwikkel jouw talent!</p>
 
           <Link href="/catalog">
-            <a className="bg-primary-blue hover:bg-green-700 text-white font-medium py-2 px-4 rounded-full">Bekijk de catalogus</a>
+            <a className="bg-primary-blue hover:bg-primary-blue-dark text-white font-medium py-2 px-4 rounded-full shadow-md transition ease-out duration-500">Bekijk de catalogus</a>
           </Link>
         </div>
       </div>
@@ -25,7 +25,7 @@ function Home({ chunkedPopularTopics, chunkedPopularCourses }) {
             <div className="flex items-end justify-between">
               <h2 className="text-xl font-bold">Verken aanbevolen cursussen</h2>
               <Link href="/catalog">
-                <a className="text-sm hover:text-primary-blue">Bekijk de catalogus <span>&raquo;</span></a>
+                <a className="text-sm hover:text-primary-blue transition ease-out duration-500">Bekijk de catalogus <span>&raquo;</span></a>
               </Link>
             </div>
           </div>
@@ -33,28 +33,55 @@ function Home({ chunkedPopularTopics, chunkedPopularCourses }) {
           {chunkedPopularCourses.map((courseChunk, index) => (
             <div className="flex -mx-2" key={index.toString()}>
               {courseChunk.map(course => (
-                <div className="w-1/4 px-2 mb-2" key={course.id.toString()}>
-                  <div className="bg-white border shadow-sm rounded">
-                    <div className="overflow-hidden rounded-t">
-                      <img src="https://picsum.photos/id/203/320/180" />
+                <div className="w-1/4 px-2 mb-2 flex items-stretch" key={course.id.toString()}>
+                  <div className="flex flex-col flex-grow bg-white border shadow-sm rounded-lg group">
+                    <div className="overflow-hidden rounded-t-lg">
+                      <Link href="/courses/[course]" as={`/courses/${course.slug}`}>
+                        <a className="hover:text-primary-blue">
+                          <img src="https://picsum.photos/id/203/320/180" className="group-hover:filter-brightness-80 transition-filter ease-out duration-500" />
+                        </a>
+                      </Link>
                     </div>
 
-                    <div className="px-4 py-3">
-                      <h2 className="font-medium text-lg mb-2">
+                    <div className="px-4 py-4">
+                      <h2 className="mb-2 text-xl font-medium  leading-tight">
                         <Link href="/courses/[course]" as={`/courses/${course.slug}`}>
-                          <a className="hover:text-purple-600">{course.title.nl}</a>
+                          <a className="hover:text-primary-blue">{course.title.nl}</a>
                         </Link>
                       </h2>
-                      <p className="text-sm leading-snug">{course.description_excerpt.nl}</p>
+                      <p className="mb-4 text-xs text-gray-600 font-medium">Door {course.authors.map(author => <span>{author.name}</span>)}</p>
+                      <p className="text-sm leading-">{course.description_excerpt.nl}</p>
                     </div>
 
-                    <div className="px-4">
-                      {course.tags.map(tag => (
-                        <Link href="/test" key={tag.id.toString()}>
-                          <a className="text-xs font-medium">{tag.name.nl}</a>
-                        </Link>
-                      ))}
+                    <div className="mt-auto">
+                      <div className="px-4 mb-4 mt-auto">
+                        {course.tags.map(tag => (
+                          <span className="bg-gray-200 px-1 py-1 text-xs font-medium rounded-sm shadow-sm">{tag.name.nl}</span>
+
+                          // Link to catalog with filter by tag
+                          // <Link href="/test" key={tag.id.toString()}>
+                          //   <a className="bg-gray-200 px-1 py-1 text-xs font-medium rounded-sm shadow-sm">{tag.name.nl}</a>
+                          // </Link>
+                        ))}
+                      </div>
+
+                      <div className="px-4 py-3 mt-auto border-t flex justify-between">
+                        <div className="inline-block">
+                          <div className="flex mr-2">
+                            <svg className="w-4 h-4 text-primary-blue mr-1" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            <span className="text-xs font-medium">{course.students_count}</span>
+                          </div>
+                        </div>
+
+                        <div className="inline-block">
+                          <div className="flex mr-2">
+                            <svg className="w-4 h-4 text-primary-blue mr-1" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path></svg>
+                            <span className="text-xs font-medium">{course.language.display_name.nl}</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
+
                   </div>
                 </div>
               ))}
@@ -82,7 +109,7 @@ function Home({ chunkedPopularTopics, chunkedPopularCourses }) {
                 <div className="w-1/4 px-2 mb-2 flex items-stretch" key={topic.id.toString()}>
                   <Link href="/topics/[topic]" as={`/topics/${topic.slug}`}>
                     <a className="flex items-stretch rounded-lg">
-                      <div className="bg-white border rounded-lg overflow-hidden">
+                      <div className="bg-white border shadow-sm rounded-lg overflow-hidden">
                         <img src="/images/digital-marketing-1433427_1920.jpg" style={{ filter: 'brightness(80%)' }} />
 
                         <div className="py-5 px-4">
@@ -140,16 +167,16 @@ export async function getStaticProps() {
   })
   const popularCourses = await courseService.getAll({
     params: {
-      'include': ['tags'],
+      'include': ['authors', 'tags', 'language', 'studentsCount'],
       'sort': '-popular',
-      'page[size]': 6,
+      'page[size]': 8,
     },
   })
 
   return {
     props: {
       chunkedPopularTopics: _.chunk(popularTopics, 4),
-      chunkedPopularCourses: _.chunk(popularCourses, 3),
+      chunkedPopularCourses: _.chunk(popularCourses, 4),
     },
   }
 }
