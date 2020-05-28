@@ -38,7 +38,7 @@ function Home({ chunkedPopularTopics, chunkedPopularCourses }) {
                     <div className="overflow-hidden rounded-t-lg">
                       <Link href="/courses/[course]" as={`/courses/${course.slug}`}>
                         <a className="hover:text-primary-blue">
-                          <img src="https://picsum.photos/id/203/320/180" className="w-full group-hover:filter-brightness-80 transition-filter ease-out duration-500" />
+                          <img src={course.thumbnail_url} className="w-full group-hover:filter-brightness-80 transition-filter ease-out duration-500" />
                         </a>
                       </Link>
                     </div>
