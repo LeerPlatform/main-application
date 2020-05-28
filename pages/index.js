@@ -49,7 +49,16 @@ function Home({ chunkedPopularTopics, chunkedPopularCourses }) {
                           <a className="hover:text-primary-blue">{course.title.nl}</a>
                         </Link>
                       </h2>
-                      <p className="mb-4 text-xs text-gray-600 font-medium">Door {course.authors.map(author => <span>{author.name}</span>)}</p>
+                      <p className="mb-4 text-xs text-gray-600 font-medium">
+                        Door {course.authors.map((author, index) => (
+                          <>
+                            <Link href="/test">
+                              <a className="text-primary-blue hover:text-primary-blue-dark">{author.name}</a>
+                            </Link>
+                            {(course.authors.length - 1 !== index) && (course.authors.length - 2 !== index) ? ', ' : (course.authors.length - 2 === index) ? ' en ' : ''}
+                          </>
+                        ))}
+                      </p>
                       <p className="text-sm leading-">{course.description_excerpt.nl}</p>
                     </div>
 
