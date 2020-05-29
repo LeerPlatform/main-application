@@ -63,18 +63,14 @@ function Home({ chunkedPopularTopics, chunkedPopularCourses }) {
                     </div>
 
                     <div className="mt-auto">
-                      <div className="px-4 mb-4 mt-auto w-auto">
-                        <p>
+                      <div className="px-4 mb-4 -mt-2 mt-auto w-auto">
                         {course.tags.map(tag => (
-                          <span className="mr-2 bg-gray-200 px-1 py-1 text-xs font-medium rounded-sm shadow-sm">{tag.name.nl}</span>
-
                           // Link to catalog with filter by tag
-                          // <Link href="/test" key={tag.id.toString()}>
-                          //   <a className="bg-gray-200 px-1 py-1 text-xs font-medium rounded-sm shadow-sm">{tag.name.nl}</a>
-                          // </Link>
-                          ))}
-                          </p>
-                        </div>
+                          <Link href="/test" key={tag.id.toString()}>
+                            <div className="inline-block mr-2 mt-2"><a className="bg-gray-200 hover:bg-gray-300 px-1 py-1 text-xs font-medium rounded-sm shadow-sm">{tag.name.nl}</a></div>
+                          </Link>
+                        ))}
+                      </div>
 
                       <div className="px-4 py-3 mt-auto border-t flex justify-between">
                         <div className="inline-block">
