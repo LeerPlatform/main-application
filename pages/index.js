@@ -59,20 +59,22 @@ function Home({ chunkedPopularTopics, chunkedPopularCourses }) {
                           </>
                         ))}
                       </p>
-                      <p className="text-sm leading-">{course.description_excerpt.nl}</p>
+                      <p className="text-sm">{course.description_excerpt.nl.slice(0, 250)}{course.description_excerpt.nl.length > 250 ? '...' : ''}</p>
                     </div>
 
                     <div className="mt-auto">
-                      <div className="px-4 mb-4 mt-auto">
+                      <div className="px-4 mb-4 mt-auto w-auto">
+                        <p>
                         {course.tags.map(tag => (
-                          <span className="bg-gray-200 px-1 py-1 text-xs font-medium rounded-sm shadow-sm">{tag.name.nl}</span>
+                          <span className="mr-2 bg-gray-200 px-1 py-1 text-xs font-medium rounded-sm shadow-sm">{tag.name.nl}</span>
 
                           // Link to catalog with filter by tag
                           // <Link href="/test" key={tag.id.toString()}>
                           //   <a className="bg-gray-200 px-1 py-1 text-xs font-medium rounded-sm shadow-sm">{tag.name.nl}</a>
                           // </Link>
-                        ))}
-                      </div>
+                          ))}
+                          </p>
+                        </div>
 
                       <div className="px-4 py-3 mt-auto border-t flex justify-between">
                         <div className="inline-block">
