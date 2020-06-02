@@ -1,7 +1,7 @@
-import Document, { Head, Main, NextScript } from 'next/document';
+import NextDocument, { Head, Main, NextScript } from 'next/document';
 import React from 'react';
 
-class CustomDocument extends Document {
+class Document extends NextDocument {
   render() {
     return (
       <html lang="en">
@@ -23,4 +23,4 @@ class CustomDocument extends Document {
   }
 }
 
-export default CustomDocument;
+export default Document;
