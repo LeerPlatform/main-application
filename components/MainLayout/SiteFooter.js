@@ -20,15 +20,15 @@ export default function SiteFooter({ children }) {
 
               <nav className="flex flex-col text-sm text-gray-700 leading-relaxed">
                 <Link href="/test">
-                  <a className="hover:text-primary-blue">Over</a>
+                  <a className="hover:text-primary-blue transition ease-out duration-500">Over</a>
                 </Link>
 
                 <Link href="/test">
-                  <a className="hover:text-primary-blue">Team</a>
+                  <a className="hover:text-primary-blue transition ease-out duration-500">Team</a>
                 </Link>
 
                 <Link href="/test">
-                  <a className="hover:text-primary-blue">Blog</a>
+                  <a className="hover:text-primary-blue transition ease-out duration-500">Blog</a>
                 </Link>
               </nav>
 
@@ -39,11 +39,11 @@ export default function SiteFooter({ children }) {
 
               <nav className="flex flex-col text-sm text-gray-700 leading-relaxed">
                 <Link href="/test">
-                  <a className="hover:text-primary-blue">Knowledge Base</a>
+                  <a className="hover:text-primary-blue transition ease-out duration-500">Knowledge Base</a>
                 </Link>
 
                 <Link href="/test">
-                  <a className="hover:text-primary-blue">Support</a>
+                  <a className="hover:text-primary-blue transition ease-out duration-500">Support</a>
                 </Link>
               </nav>
             </div>
@@ -53,11 +53,11 @@ export default function SiteFooter({ children }) {
 
               <nav className="flex flex-col text-sm text-gray-700 leading-relaxed">
                 <Link href="/test">
-                  <a className="hover:text-primary-blue">Word een instructeur</a>
+                  <a className="hover:text-primary-blue transition ease-out duration-500">Word een instructeur</a>
                 </Link>
 
                 <Link href="/test">
-                  <a className="hover:text-primary-blue">Naar studio gaan</a>
+                  <a className="hover:text-primary-blue transition ease-out duration-500">Naar studio gaan</a>
                 </Link>
               </nav>
             </div>
