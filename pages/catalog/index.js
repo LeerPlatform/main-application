@@ -1,9 +1,12 @@
 import Link from 'next/link'
-import MainLayout from '../../components/MainLayout'
+import { useState } from 'react'
 import _ from 'lodash'
 import { courseService } from '../../services'
+import MainLayout from '../../components/MainLayout'
 
-function Catalog({ courses, coursesCount, query }) {
+function Catalog({ courses, coursesCount, initialSearchQuery }) {
+  const [searchQuery, setSearchQuery] = useState(initialSearchQuery)
+
   return (
     <MainLayout>
 
@@ -17,6 +20,7 @@ function Catalog({ courses, coursesCount, query }) {
                   className="border-2 border-gray-300 bg-white h-10 px-5 pl-10 rounded-lg text-sm focus:outline-none"
                   type="search"
                   name="search"
+                  value={searchQuery}
                   placeholder="Search"
                 />
 
@@ -34,7 +38,7 @@ function Catalog({ courses, coursesCount, query }) {
 
             <div className="flex justify-between py-2 mb-4">
               <div>
-                <p className="text-sm">{coursesCount} resultaten voor "{query}"</p>
+                <p className="text-sm">{coursesCount} resultaten voor "{initialSearchQuery}"</p>
 
               </div>
 
@@ -43,7 +47,7 @@ function Catalog({ courses, coursesCount, query }) {
               </div>
             </div>
 
-            {courses.map(course => (
+            {courses && courses.map(course => (
               <Link href="/test">
                 <a>
                   <div className="flex mb-4 bg-white border shadow-sm rounded-lg group" key={course.id.toString()}>
@@ -116,11 +120,14 @@ function Catalog({ courses, coursesCount, query }) {
   )
 }
 
-export async function getStaticProps() {
+export async function getServerSideProps(context) {
+  const initialSearchQuery = context.query.query
+
   const courses = await courseService.getAll({
     params: {
       'include': ['authors', 'tags', 'language', 'studentsCount'],
-      'page[size]': 32,
+      'page[size]': 16,
+      'filter[]': [],
     },
   })
 
@@ -128,7 +135,7 @@ export async function getStaticProps() {
     props: {
       courses,
       coursesCount: 203,
-      query: 'PHP cursus',
+      initialSearchQuery,
     },
   }
 }
