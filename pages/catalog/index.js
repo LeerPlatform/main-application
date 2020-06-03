@@ -121,13 +121,13 @@ function Catalog({ courses, coursesCount, initialSearchQuery }) {
 }
 
 export async function getServerSideProps(context) {
-  const initialSearchQuery = context.query.query
+  const initialSearchQuery = context.query.query ?? null
 
   const courses = await courseService.getAll({
     params: {
       'include': ['authors', 'tags', 'language', 'studentsCount'],
       'page[size]': 16,
-      'filter[]': [],
+      // 'filter[]': [],
     },
   })
 
