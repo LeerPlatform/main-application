@@ -36,15 +36,15 @@ function SiteHeader() {
                 </a>
               </Link>
 
-              <Link href="/news">
+              <Link href="/programs">
                 <a className="flex flex-row items-center px-2 lg:px-3 py-2 rounded-md hover:text-primary-blue focus:outline-none focus:text-gray-800 transition ease-out duration-700">
-                  Nieuws
+                  Leerpaden
                 </a>
               </Link>
 
-              <Link href="/leaderbord">
+              <Link href="/news">
                 <a className="flex flex-row items-center px-2 lg:px-3 py-2 rounded-md hover:text-primary-blue focus:outline-none focus:text-gray-800 transition ease-out duration-700">
-                  Leaderbord
+                  Nieuws
                 </a>
               </Link>
 
