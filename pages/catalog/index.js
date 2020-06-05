@@ -4,15 +4,28 @@ import _ from 'lodash'
 import { courseService } from '../../services'
 import MainLayout from '../../components/MainLayout'
 
-function Catalog({ initialCourses, coursesCount, initialSearchQuery }) {
+function Catalog({ initialResult, initialMeta, initialSearchQuery }) {
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery)
-  const [courses, setCourses] = useState(initialCourses)
+  const [courses, setCourses] = useState(initialResult)
+  const [currentSearchQuery, setCurrentSearchQuery] = useState(initialSearchQuery)
+  const [currentSearchResultCount, setCurrentSearchResultCount] = useState(initialMeta.total)
 
-  async function handleSearchChange(event) {
-    const value = event.target.value.trim()
+  function handleSearchChange(event) {
+    setSearchQuery(event.target.value)
+  }
 
-    setCourses(await fetchCourses({ query: value }))
-    setSearchQuery(value)
+  async function handleSearchKeyPress(event) {
+    if (event.key === "Enter") {
+      applySearch()
+    }
+  }
+
+  async function applySearch() {
+    const { data, meta } = await fetchCourses({ query: searchQuery })
+
+    setCourses(data)
+    setCurrentSearchQuery(searchQuery)
+    setCurrentSearchResultCount(meta.total)
   }
 
   return (
@@ -30,6 +43,7 @@ function Catalog({ initialCourses, coursesCount, initialSearchQuery }) {
                   value={searchQuery}
                   placeholder="Search"
                   onChange={handleSearchChange}
+                  onKeyPress={handleSearchKeyPress}
                 />
 
                 <button type="submit" className="absolute left-0 top-0 mt-3 ml-4">
@@ -46,7 +60,7 @@ function Catalog({ initialCourses, coursesCount, initialSearchQuery }) {
 
             <div className="flex justify-between py-2 mb-4">
               <div>
-                <p className="text-sm">{coursesCount} resultaten {initialSearchQuery && (<>voor "{initialSearchQuery}"</>)}</p>
+                <p className="text-sm">{currentSearchResultCount} resultaten {currentSearchQuery && (<>voor "{currentSearchQuery}"</>)}</p>
               </div>
 
               <div>
@@ -83,35 +97,6 @@ function Catalog({ initialCourses, coursesCount, initialSearchQuery }) {
                   <p className="text-sm">{course.description_excerpt.nl.slice(0, 150).trim()}{course.description_excerpt.nl.length > 150 ? '...' : ''}</p>
                 </div>
 
-                {/* <div className="mt-auto">
-                  <div className="px-4 mb-4 -mt-2 mt-auto w-auto">
-                    {course.tags.map(tag => (
-                      // Link to catalog with filter by tag
-                      <div className="inline-block mr-2 mt-2">
-                        <Link href="/test" key={tag.id.toString()}>
-                          <a className="bg-gray-200 hover:bg-gray-300 px-1 py-1 text-xs font-medium rounded-sm shadow-sm transition ease-out duration-500">{tag.name.nl}</a>
-                        </Link>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="px-4 py-3 mt-auto border-t flex justify-between">
-                    <div className="inline-block">
-                      <div className="flex mr-2">
-                        <svg className="w-4 h-4 text-primary-blue mr-1" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                        <span className="text-xs font-medium">{course.students_count}</span>
-                      </div>
-                    </div>
-
-                    <div className="inline-block">
-                      <div className="flex mr-2">
-                        <svg className="w-4 h-4 text-primary-blue mr-1" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path></svg>
-                        <span className="text-xs font-medium">{course.language.display_name.nl}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div> */}
-
               </div>
             ))}
 
@@ -132,20 +117,18 @@ async function fetchCourses({query}) {
     params['filter[query]'] = query
   }
 
-  const courses = await courseService.getAll({params})
-
-  return courses
+  return await courseService.getAll({ params })
 }
 
 export async function getServerSideProps(context) {
   const initialSearchQuery = context.query?.query ?? null
-  const initialCourses = await fetchCourses({ query: initialSearchQuery })
+  const { data: initialResult, meta: initialMeta  } = await fetchCourses({ query: initialSearchQuery })
 
   return {
     props: {
       initialSearchQuery,
-      initialCourses,
-      coursesCount: 203,
+      initialResult,
+      initialMeta,
     },
   }
 }
