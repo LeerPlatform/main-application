@@ -4,12 +4,19 @@ import _ from 'lodash'
 import { courseService } from '../../services'
 import MainLayout from '../../components/MainLayout'
 
-function Catalog({ courses, coursesCount, initialSearchQuery }) {
+function Catalog({ initialCourses, coursesCount, initialSearchQuery }) {
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery)
+  const [courses, setCourses] = useState(initialCourses)
+
+  async function handleSearchChange(event) {
+    const value = event.target.value.trim()
+
+    setCourses(await fetchCourses({ query: value }))
+    setSearchQuery(value)
+  }
 
   return (
     <MainLayout>
-
       <div className="container mx-auto px-4 py-12">{/* mt-6 bg-gray-300 */}
         <div className="flex -mx-4">
           <div className="w-4/12 px-4">
@@ -17,11 +24,12 @@ function Catalog({ courses, coursesCount, initialSearchQuery }) {
             <div>
               <div className="relative text-gray-600">
                 <input
-                  className="border-2 border-gray-300 bg-white h-10 px-5 pl-10 rounded-lg text-sm focus:outline-none"
+                  className="border-2 border-gray-300 bg-white h-10 px-5 pl-10 rounded-lg text-sm focus:outline-none appearance-none"
                   type="search"
                   name="search"
                   value={searchQuery}
                   placeholder="Search"
+                  onChange={handleSearchChange}
                 />
 
                 <button type="submit" className="absolute left-0 top-0 mt-3 ml-4">
@@ -110,32 +118,34 @@ function Catalog({ courses, coursesCount, initialSearchQuery }) {
           </div>
         </div>
       </div>
-
     </MainLayout>
   )
 }
 
-export async function getServerSideProps(context) {
-  const initialSearchQuery = context.query?.query ?? null
-  const filterQueryParam = {}
-
-  if (typeof initialSearchQuery === 'string') {
-    filterQueryParam['filter[query]'] = initialSearchQuery
+async function fetchCourses({query}) {
+  const params = {
+    'include': ['authors', 'tags', 'language', 'studentsCount'],
+    'page[size]': 16,
   }
 
-  const courses = await courseService.getAll({
-    params: {
-      'include': ['authors', 'tags', 'language', 'studentsCount'],
-      'page[size]': 16,
-      ...filterQueryParam,
-    },
-  })
+  if (typeof query === 'string') {
+    params['filter[query]'] = query
+  }
+
+  const courses = await courseService.getAll({params})
+
+  return courses
+}
+
+export async function getServerSideProps(context) {
+  const initialSearchQuery = context.query?.query ?? null
+  const initialCourses = await fetchCourses({ query: initialSearchQuery })
 
   return {
     props: {
-      courses,
-      coursesCount: 203,
       initialSearchQuery,
+      initialCourses,
+      coursesCount: 203,
     },
   }
 }
