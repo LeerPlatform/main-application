@@ -2,7 +2,7 @@
 
 > Online courses platform
 
-![leer-platform test 3000 (2)](https://user-images.githubusercontent.com/16477999/83013809-ea159480-a01d-11ea-98a3-749bfa74e319.png)
+![leer-platform test 3000 (3)](https://user-images.githubusercontent.com/16477999/83916717-f31d0900-a775-11ea-94e5-398a9f42059f.png)
 
 ## Overview
 
