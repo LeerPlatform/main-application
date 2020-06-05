@@ -38,8 +38,7 @@ function Catalog({ courses, coursesCount, initialSearchQuery }) {
 
             <div className="flex justify-between py-2 mb-4">
               <div>
-                <p className="text-sm">{coursesCount} resultaten voor "{initialSearchQuery}"</p>
-
+                <p className="text-sm">{coursesCount} resultaten {initialSearchQuery && (<>voor "{initialSearchQuery}"</>)}</p>
               </div>
 
               <div>
@@ -48,68 +47,64 @@ function Catalog({ courses, coursesCount, initialSearchQuery }) {
             </div>
 
             {courses && courses.map(course => (
-              <Link href="/test">
-                <a>
-                  <div className="flex mb-4 bg-white border shadow-sm rounded-lg group" key={course.id.toString()}>
-                    <div className="w-4/8 overflow-hidden rounded-l-lg">
-                      <Link href="/courses/[course]" as={`/courses/${course.slug}`}>
-                        <a className="hover:text-primary-blue">
-                          <img src={course.thumbnail_url} className="w-full group-hover:filter-brightness-80 transition-filter ease-out duration-500" />
-                        </a>
+              <div className="flex flex-wrap mb-4 bg-white border shadow-sm rounded-lg group" key={course.id.toString()}>
+                <div className="w-2/5 overflow-hidden rounded-l-lg">
+                  <Link href="/courses/[course]" as={`/courses/${course.slug}`}>
+                    <a className="hover:text-primary-blue">
+                      <img src={course.thumbnail_url} className="w-full group-hover:filter-brightness-80 transition-filter ease-out duration-500" />
+                    </a>
+                  </Link>
+                </div>
+
+                <div className="w-3/5 px-4 py-4">
+                  <h2 className="mb-2 text-xl font-medium  leading-tight">
+                    <Link href="/courses/[course]" as={`/courses/${course.slug}`}>
+                      <a className="hover:text-primary-blue transition ease-out duration-500">{course.title.nl}</a>
+                    </Link>
+                  </h2>
+                  <p className="mb-2 text-xs text-gray-600 font-medium">
+                    Door {course.authors.map((author, index) => (
+                    <>
+                      <Link href="/test">
+                        <a className="text-primary-blue hover:text-primary-blue-dark transition ease-out duration-500">{author.name}</a>
                       </Link>
-                    </div>
+                      {(course.authors.length - 1 !== index) && (course.authors.length - 2 !== index) ? ', ' : (course.authors.length - 2 === index) ? ' en ' : ''}
+                    </>
+                  ))}
+                  </p>
+                  <p className="text-sm">{course.description_excerpt.nl.slice(0, 150).trim()}{course.description_excerpt.nl.length > 150 ? '...' : ''}</p>
+                </div>
 
-                    <div className="w-4/8 px-4 py-4">
-                      <h2 className="mb-2 text-xl font-medium  leading-tight">
-                        <Link href="/courses/[course]" as={`/courses/${course.slug}`}>
-                          <a className="hover:text-primary-blue transition ease-out duration-500">{course.title.nl}</a>
+                {/* <div className="mt-auto">
+                  <div className="px-4 mb-4 -mt-2 mt-auto w-auto">
+                    {course.tags.map(tag => (
+                      // Link to catalog with filter by tag
+                      <div className="inline-block mr-2 mt-2">
+                        <Link href="/test" key={tag.id.toString()}>
+                          <a className="bg-gray-200 hover:bg-gray-300 px-1 py-1 text-xs font-medium rounded-sm shadow-sm transition ease-out duration-500">{tag.name.nl}</a>
                         </Link>
-                      </h2>
-                      <p className="mb-4 text-xs text-gray-600 font-medium">
-                        Door {course.authors.map((author, index) => (
-                        <>
-                          <Link href="/test">
-                            <a className="text-primary-blue hover:text-primary-blue-dark transition ease-out duration-500">{author.name}</a>
-                          </Link>
-                          {(course.authors.length - 1 !== index) && (course.authors.length - 2 !== index) ? ', ' : (course.authors.length - 2 === index) ? ' en ' : ''}
-                        </>
-                      ))}
-                      </p>
-                      <p className="text-sm">{course.description_excerpt.nl.slice(0, 250)}{course.description_excerpt.nl.length > 250 ? '...' : ''}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="px-4 py-3 mt-auto border-t flex justify-between">
+                    <div className="inline-block">
+                      <div className="flex mr-2">
+                        <svg className="w-4 h-4 text-primary-blue mr-1" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        <span className="text-xs font-medium">{course.students_count}</span>
+                      </div>
                     </div>
 
-                    {/* <div className="mt-auto">
-                      <div className="px-4 mb-4 -mt-2 mt-auto w-auto">
-                        {course.tags.map(tag => (
-                          // Link to catalog with filter by tag
-                          <div className="inline-block mr-2 mt-2">
-                            <Link href="/test" key={tag.id.toString()}>
-                              <a className="bg-gray-200 hover:bg-gray-300 px-1 py-1 text-xs font-medium rounded-sm shadow-sm transition ease-out duration-500">{tag.name.nl}</a>
-                            </Link>
-                          </div>
-                        ))}
+                    <div className="inline-block">
+                      <div className="flex mr-2">
+                        <svg className="w-4 h-4 text-primary-blue mr-1" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path></svg>
+                        <span className="text-xs font-medium">{course.language.display_name.nl}</span>
                       </div>
-
-                      <div className="px-4 py-3 mt-auto border-t flex justify-between">
-                        <div className="inline-block">
-                          <div className="flex mr-2">
-                            <svg className="w-4 h-4 text-primary-blue mr-1" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                            <span className="text-xs font-medium">{course.students_count}</span>
-                          </div>
-                        </div>
-
-                        <div className="inline-block">
-                          <div className="flex mr-2">
-                            <svg className="w-4 h-4 text-primary-blue mr-1" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path></svg>
-                            <span className="text-xs font-medium">{course.language.display_name.nl}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div> */}
-
+                    </div>
                   </div>
-                </a>
-              </Link>
+                </div> */}
+
+              </div>
             ))}
 
           </div>
@@ -121,13 +116,18 @@ function Catalog({ courses, coursesCount, initialSearchQuery }) {
 }
 
 export async function getServerSideProps(context) {
-  const initialSearchQuery = context.query.query ?? null
+  const initialSearchQuery = context.query?.query ?? null
+  const filterQueryParam = {}
+
+  if (typeof initialSearchQuery === 'string') {
+    filterQueryParam['filter[query]'] = initialSearchQuery
+  }
 
   const courses = await courseService.getAll({
     params: {
       'include': ['authors', 'tags', 'language', 'studentsCount'],
       'page[size]': 16,
-      // 'filter[]': [],
+      ...filterQueryParam,
     },
   })
 
