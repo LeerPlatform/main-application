@@ -3,6 +3,8 @@ import { useState } from 'react'
 import _ from 'lodash'
 import { courseService } from '../../services'
 import MainLayout from '../../components/MainLayout'
+import SearchBar from '../../components/CatalogView/SearchBar'
+import ResultIndicator from '../../components/CatalogView/ResultIndicator'
 
 function Catalog({ initialResult, initialMeta, initialSearchQuery }) {
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery)
@@ -10,16 +12,6 @@ function Catalog({ initialResult, initialMeta, initialSearchQuery }) {
   const [currentSearchQuery, setCurrentSearchQuery] = useState(initialSearchQuery)
   const [currentSearchResultCount, setCurrentSearchResultCount] = useState(initialMeta.total)
   const [sortBy, setSortBy] = useState('-popular')
-
-  function handleSearchChange(event) {
-    setSearchQuery(event.target.value)
-  }
-
-  async function handleSearchKeyPress(event) {
-    if (event.key === "Enter") {
-      applySearch()
-    }
-  }
 
   function handleSortByChange(event) {
     let value = '-popular'
@@ -38,6 +30,14 @@ function Catalog({ initialResult, initialMeta, initialSearchQuery }) {
     setCurrentSearchResultCount(meta.total)
   }
 
+  function handleFilterTextChange(filterText) {
+    setSearchQuery(filterText)
+  }
+
+  function handleFilterTextEnter() {
+    applySearch()
+  }
+
   return (
     <MainLayout>
       <div className="container mx-auto px-4 py-12">{/* mt-6 bg-gray-300 */}
@@ -45,23 +45,11 @@ function Catalog({ initialResult, initialMeta, initialSearchQuery }) {
           <div className="w-4/12 px-4">
 
             <div>
-              <div className="relative text-gray-600">
-                <input
-                  className="border-2 border-gray-300 bg-white h-10 px-5 pl-10 rounded-lg text-sm focus:outline-none appearance-none"
-                  type="search"
-                  name="search"
-                  value={searchQuery}
-                  placeholder="Search"
-                  onChange={handleSearchChange}
-                  onKeyPress={handleSearchKeyPress}
-                />
-
-                <button type="submit" className="absolute left-0 top-0 mt-3 ml-4 focus:outline-none text-gray-600" onClick={applySearch}>
-                  <svg className="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 56.966 56.966" style={{ enableBackgroundNew: '0 0 56.966 56.966'}} xmlSpace="preserve" width="512px" height="512px">
-                    <path d="M55.146,51.887L41.588,37.786c3.486-4.144,5.396-9.358,5.396-14.786c0-12.682-10.318-23-23-23s-23,10.318-23,23  s10.318,23,23,23c4.761,0,9.298-1.436,13.177-4.162l13.661,14.208c0.571,0.593,1.339,0.92,2.162,0.92  c0.779,0,1.518-0.297,2.079-0.837C56.255,54.982,56.293,53.08,55.146,51.887z M23.984,6c9.374,0,17,7.626,17,17s-7.626,17-17,17  s-17-7.626-17-17S14.61,6,23.984,6z" />
-                  </svg>
-                </button>
-              </div>
+              <SearchBar
+                filterText={searchQuery}
+                onFilterTextChange={handleFilterTextChange}
+                onFilterTextEnter={handleFilterTextEnter}
+              />
             </div>
 
           </div>
@@ -70,7 +58,10 @@ function Catalog({ initialResult, initialMeta, initialSearchQuery }) {
 
             <div className="flex justify-between py-2 mb-4">
               <div>
-                <p className="text-sm">{currentSearchResultCount > 0 ? `${currentSearchResultCount}` : 'Geen'} resultaten {currentSearchQuery && (<>voor "{currentSearchQuery}"</>)}</p>
+                <ResultIndicator
+                  totalResultsCount={currentSearchResultCount}
+                  searchTerms={currentSearchQuery}
+                />
               </div>
 
               <div>
