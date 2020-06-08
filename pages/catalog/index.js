@@ -52,7 +52,7 @@ function Catalog({ initialResult, initialMeta, initialSearchQuery }) {
 
           </div>
 
-          <div className="w-8/2 px-4">
+          <div className="w-8/12 px-4">
 
             <div className="flex justify-between py-2 mb-4">
               <div>
