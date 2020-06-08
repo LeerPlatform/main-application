@@ -1,7 +1,7 @@
 export default function ResultSorter({ selectedSort, onSelectedSortChange }) {
   const options = [
-    { id: 0, value: '-popular', name: 'Popular' },
-    { id: 1, value: 'latest', name: 'Latest'},
+    { id: '0', value: 'popular_all_time', name: 'Popular' },
+    { id: '1', value: 'latest', name: 'Latest'},
   ]
 
   function handleSelectedSortChange(event) {
@@ -10,9 +10,18 @@ export default function ResultSorter({ selectedSort, onSelectedSortChange }) {
 
   return (
     <div className="inline-block relative w-48">
-      <select className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow text-sm leading-tight focus:outline-none focus:shadow-outline" onChange={handleSelectedSortChange}>
+      <select
+        className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow text-sm leading-tight focus:outline-none focus:shadow-outline"
+        onChange={handleSelectedSortChange}
+        defaultValue={selectedSort}
+      >
         {options.map(option => (
-          <option value={option.value} defaultChecked={option.value === selectedSort} key={option.id}>{option.name}</option>
+          <option
+            value={option.value}
+            key={option.id}
+          >
+            {option.name}
+          </option>
         ))}
       </select>
 

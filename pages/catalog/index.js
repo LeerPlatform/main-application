@@ -1,21 +1,44 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import _ from 'lodash'
-import { courseService } from '../../services'
+import { useDidUpdateEffect, objectToQueryString } from '../../helpers'
+import { courseService, topicService } from '../../services'
 import MainLayout from '../../components/MainLayout'
 import SearchBar from '../../components/CatalogView/SearchBar'
 import ResultIndicator from '../../components/CatalogView/ResultIndicator'
 import ResultSorter from '../../components/CatalogView/ResultSorter'
 import CourseList from '../../components/CatalogView/CourseList'
+import Router from 'next/router'
 
-function Catalog({ initialResult, initialMeta, initialSearchQuery }) {
+function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initialMeta, topics }) {
+  // Search criteria
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery)
+  const [searchSort, setSearchSort] = useState(initialSearchSort)
+
+  // Result
   const [courses, setCourses] = useState(initialResult)
   const [currentSearchQuery, setCurrentSearchQuery] = useState(initialSearchQuery)
   const [currentSearchResultCount, setCurrentSearchResultCount] = useState(initialMeta.total)
-  const [selectedSort, setSelectedSort] = useState('-popular')
+
+  useDidUpdateEffect(() => {
+    applySearch()
+  }, [searchQuery, searchSort])
+
+  // useDidUpdateEffect(() => {
+  //   const params = {}
+
+  //   if (searchQuery) {
+  //     params['query'] = searchQuery
+  //   }
+
+  //   if (searchSort) {
+  //     params['sort'] = searchSort
+  //   }
+
+  //   Router.push(`/catalog?${objectToQueryString(params)}`, undefined, { shallow: true })
+  // }, [searchQuery, searchSort])
 
   async function applySearch() {
-    const { data, meta } = await fetchCourses({ query: searchQuery, sort: selectedSort })
+    const { data, meta } = await fetchCourses({ query: searchQuery, sort: searchSort })
 
     setCourses(data)
     setCurrentSearchQuery(searchQuery)
@@ -31,14 +54,12 @@ function Catalog({ initialResult, initialMeta, initialSearchQuery }) {
   }
 
   function handleSelectedSortChange(value) {
-    setSelectedSort(value)
-
-    applySearch()
+    setSearchSort(value)
   }
 
   return (
     <MainLayout>
-      <div className="container mx-auto px-4 py-12">{/* mt-6 bg-gray-300 */}
+      <div className="container mx-auto px-4 py-8">
         <div className="flex -mx-4">
           <div className="w-4/12 px-4">
 
@@ -48,6 +69,36 @@ function Catalog({ initialResult, initialMeta, initialSearchQuery }) {
                 onFilterTextChange={handleFilterTextChange}
                 onFilterTextEnter={handleFilterTextEnter}
               />
+            </div>
+
+            <div className="mt-4">
+              <strong>Onderwerp</strong>
+
+              <div>
+                {topics.map(topic => (
+                  <div className="hover:bg-white py-2">
+                    <label className="flex items-center">
+                      <input type="checkbox" value={topic.display_name.nl} className="mr-2" />
+                      <span>{topic.display_name.nl}</span>
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <strong>Niveau</strong>
+
+              <div>
+                {topics.map(topic => (
+                  <div className="hover:bg-white py-2">
+                    <label className="flex items-center">
+                      <input type="checkbox" value={topic.display_name.nl} className="mr-2" />
+                      <span>{topic.display_name.nl}</span>
+                    </label>
+                  </div>
+                ))}
+              </div>
             </div>
 
           </div>
@@ -64,7 +115,7 @@ function Catalog({ initialResult, initialMeta, initialSearchQuery }) {
 
               <div>
                 <ResultSorter
-                  selectedSort={selectedSort}
+                  selectedSort={searchSort}
                   onSelectedSortChange={handleSelectedSortChange}
                 />
               </div>
@@ -91,8 +142,13 @@ async function fetchCourses({ query, sort }) {
     params['filter[query]'] = query
   }
 
-  if (typeof sortBy === 'string') {
-    params['sort'] = sort ?? '-popular'
+  if (typeof sort === 'string') {
+    const sorts = {
+      'popular_all_time': '-popular',
+      'latest': '-created_at',
+    }
+
+    params['sort'] = sorts[sort] ?? '-popular'
   }
 
   return await courseService.getAll({ params })
@@ -100,13 +156,18 @@ async function fetchCourses({ query, sort }) {
 
 export async function getServerSideProps(context) {
   const initialSearchQuery = context.query?.query ?? ''
+  const initialSearchSort = context.query?.sort ?? 'popular_all_time'
   const { data: initialResult, meta: initialMeta  } = await fetchCourses({ query: initialSearchQuery })
+
+  const { data: topics } = await topicService.getAll({})
 
   return {
     props: {
       initialSearchQuery,
+      initialSearchSort,
       initialResult,
       initialMeta,
+      topics,
     },
   }
 }
