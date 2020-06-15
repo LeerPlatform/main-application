@@ -13,15 +13,24 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
   // Search criteria
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery)
   const [searchSort, setSearchSort] = useState(initialSearchSort)
+  const [searchFilterTopicId, setSearchFilterTopicId] = useState(null)
+  const [searchFilterLevels, setSearchFilterLevels] = useState(null)
 
   // Result
   const [courses, setCourses] = useState(initialResult)
   const [currentSearchQuery, setCurrentSearchQuery] = useState(initialSearchQuery)
   const [currentSearchResultCount, setCurrentSearchResultCount] = useState(initialMeta.total)
 
+  const levels = [
+    { id: 0, value: "0,1,2", title: 'Alle Niveaus' },
+    { id: 1, value: "0", title: 'Beginner' },
+    { id: 2, value: "1", title: 'Intermdiate'},
+    { id: 3, value: "2", title: 'Expert' },
+  ]
+
   useDidUpdateEffect(() => {
     applySearch()
-  }, [searchQuery, searchSort])
+  }, [searchQuery, searchSort, searchFilterTopicId, searchFilterLevels])
 
   // useDidUpdateEffect(() => {
   //   const params = {}
@@ -38,7 +47,12 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
   // }, [searchQuery, searchSort])
 
   async function applySearch() {
-    const { data, meta } = await fetchCourses({ query: searchQuery, sort: searchSort })
+    const { data, meta } = await fetchCourses({
+      query: searchQuery,
+      sort: searchSort,
+      filterTopic: searchFilterTopicId,
+      filterLevel: searchFilterLevels,
+    })
 
     setCourses(data)
     setCurrentSearchQuery(searchQuery)
@@ -55,6 +69,10 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
 
   function handleSelectedSortChange(value) {
     setSearchSort(value)
+  }
+
+  function handleTopicFilterChange(event) {
+    setSearchFilterTopicId(event.target.value)
   }
 
   return (
@@ -74,19 +92,49 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
             <div className="mt-4">
               <strong>Onderwerp</strong>
 
+              <div className="mt-3">
+                <div className="inline-block relative">
+                  <select
+                    className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow text-sm leading-tight focus:outline-none focus:shadow-outline"
+                    onChange={handleTopicFilterChange}
+                    defaultValue={searchFilterTopicId}
+                  >
+                    <option value={null}>Alle Onderwerpen</option>
+                    {topics.map(topic => (
+                      <option
+                        value={topic.id}
+                        key={topic.id}
+                      >
+                        {topic.display_name.nl}
+                      </option>
+                    ))}
+                  </select>
+
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <strong>Niveau</strong>
+
               <div>
-                {topics.map(topic => (
+                {levels.map(level => (
                   <div className="hover:bg-white py-2">
                     <label className="flex items-center">
-                      <input type="checkbox" value={topic.display_name.nl} className="mr-2" />
-                      <span>{topic.display_name.nl}</span>
+                      <input type="checkbox" value={level.value} className="mr-2" />
+                      <span>{level.title}</span>
                     </label>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="mt-4">
+            {/* <div className="mt-4">
               <strong>Niveau</strong>
 
               <div>
@@ -99,7 +147,7 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
                   </div>
                 ))}
               </div>
-            </div>
+            </div> */}
 
           </div>
 
@@ -132,9 +180,30 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
   )
 }
 
-async function fetchCourses({ query, sort }) {
+// async function fetchResults(filters = [], sort, page) {
+//   constParams = {
+//     'include': [
+//       'authors',
+//       'tags',
+//       'language',
+//       'studentsCount'
+//     ],
+//     'page[size]': 16,
+//   }
+
+//   filters
+
+//   return await courseService.getAll({ params })
+// }
+
+async function fetchCourses({ query, sort, filterTopic }) {
   const params = {
-    'include': ['authors', 'tags', 'language', 'studentsCount'],
+    'include': [
+      'authors',
+      'tags',
+      'language',
+      'studentsCount'
+    ],
     'page[size]': 16,
   }
 
@@ -151,6 +220,14 @@ async function fetchCourses({ query, sort }) {
     params['sort'] = sorts[sort] ?? '-popular'
   }
 
+  if (typeof filterTopic === 'string') {
+    params['filter[topic.id]'] = parseInt(filterTopic)
+  }
+
+  if (typeof filterLevel === 'string') {
+    params['filter[level]'] = filterTopic
+  }
+
   return await courseService.getAll({ params })
 }
 
@@ -160,6 +237,8 @@ export async function getServerSideProps(context) {
   const { data: initialResult, meta: initialMeta  } = await fetchCourses({ query: initialSearchQuery })
 
   const { data: topics } = await topicService.getAll({})
+
+  console.log(topics)
 
   return {
     props: {
