@@ -14,7 +14,8 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery)
   const [searchSort, setSearchSort] = useState(initialSearchSort)
   const [searchFilterTopicId, setSearchFilterTopicId] = useState(null)
-  const [searchFilterLevels, setSearchFilterLevels] = useState(null)
+  // const [searchFilterLevels, setSearchFilterLevels] = useState(null)
+  const [searchFilterLevels, setSearchFilterLevels] = useState(new Map())
 
   // Result
   const [courses, setCourses] = useState(initialResult)
@@ -22,7 +23,6 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
   const [currentSearchResultCount, setCurrentSearchResultCount] = useState(initialMeta.total)
 
   const levels = [
-    { id: 0, value: "0,1,2", title: 'Alle Niveaus' },
     { id: 1, value: "0", title: 'Beginner' },
     { id: 2, value: "1", title: 'Intermdiate'},
     { id: 3, value: "2", title: 'Expert' },
@@ -75,6 +75,15 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
     setSearchFilterTopicId(event.target.value)
   }
 
+  function handleSelectedLevelChange(event) {
+    const item = event.target.value
+    const isChecked = event.target.checked
+
+    console.log(searchFilterLevels.set(item, isChecked))
+
+    setSearchFilterLevels(searchFilterLevels.set(item, isChecked))
+  }
+
   return (
     <MainLayout>
       <div className="container mx-auto px-4 py-8">
@@ -93,7 +102,7 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
               <strong>Onderwerp</strong>
 
               <div className="mt-3">
-                <div className="inline-block relative">
+                <div className="w-10/12 inline-block relative">
                   <select
                     className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow text-sm leading-tight focus:outline-none focus:shadow-outline"
                     onChange={handleTopicFilterChange}
@@ -124,9 +133,9 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
 
               <div>
                 {levels.map(level => (
-                  <div className="hover:bg-white py-2">
+                  <div className="hover:bg-white py-2" key={level.id}>
                     <label className="flex items-center">
-                      <input type="checkbox" value={level.value} className="mr-2" />
+                      <input type="checkbox" value={level.value} className="mr-2" onChange={handleSelectedLevelChange} />
                       <span>{level.title}</span>
                     </label>
                   </div>
@@ -237,8 +246,6 @@ export async function getServerSideProps(context) {
   const { data: initialResult, meta: initialMeta  } = await fetchCourses({ query: initialSearchQuery })
 
   const { data: topics } = await topicService.getAll({})
-
-  console.log(topics)
 
   return {
     props: {

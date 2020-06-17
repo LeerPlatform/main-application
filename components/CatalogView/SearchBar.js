@@ -12,7 +12,7 @@ export default function SearchBar({ filterText, onFilterTextChange, onFilterText
   return (
     <div className="relative text-gray-600">
       <input
-        className="border-2 border-gray-300 bg-white h-10 px-5 pl-10 rounded-lg text-sm focus:outline-none appearance-none"
+        className="w-10/12 border-2 border-gray-300 bg-white h-10 px-5 pl-10 rounded-lg text-sm focus:outline-none appearance-none"
         type="search"
         name="search"
         value={filterText}
