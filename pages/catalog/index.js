@@ -9,6 +9,20 @@ import ResultSorter from '../../components/CatalogView/ResultSorter'
 import CourseList from '../../components/CatalogView/CourseList'
 import Router from 'next/router'
 
+  // useDidUpdateEffect(() => {
+  //   const params = {}
+
+  //   if (searchQuery) {
+  //     params['query'] = searchQuery
+  //   }
+
+  //   if (searchSort) {
+  //     params['sort'] = searchSort
+  //   }
+
+  //   Router.push(`/catalog?${objectToQueryString(params)}`, undefined, { shallow: true })
+  // }, [searchQuery, searchSort])
+
 function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initialMeta, topics }) {
   // Search criteria
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery)
@@ -31,20 +45,6 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
   useDidUpdateEffect(() => {
     applySearch()
   }, [searchQuery, searchSort, searchFilterTopicId, searchFilterLevels])
-
-  // useDidUpdateEffect(() => {
-  //   const params = {}
-
-  //   if (searchQuery) {
-  //     params['query'] = searchQuery
-  //   }
-
-  //   if (searchSort) {
-  //     params['sort'] = searchSort
-  //   }
-
-  //   Router.push(`/catalog?${objectToQueryString(params)}`, undefined, { shallow: true })
-  // }, [searchQuery, searchSort])
 
   async function applySearch() {
     const { data, meta } = await fetchCourses({
@@ -79,9 +79,7 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
     const item = event.target.value
     const isChecked = event.target.checked
 
-    console.log(searchFilterLevels.set(item, isChecked))
-
-    setSearchFilterLevels(searchFilterLevels.set(item, isChecked))
+    setSearchFilterLevels(new Map(searchFilterLevels.set(item, isChecked)))
   }
 
   return (
@@ -135,7 +133,13 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
                 {levels.map(level => (
                   <div className="hover:bg-white py-2" key={level.id}>
                     <label className="flex items-center">
-                      <input type="checkbox" value={level.value} className="mr-2" onChange={handleSelectedLevelChange} />
+                      <input
+                        type="checkbox"
+                        value={level.value}
+                        checked={!!searchFilterLevels.get(level.value)}
+                        onChange={handleSelectedLevelChange}
+                        className="mr-2"
+                      />
                       <span>{level.title}</span>
                     </label>
                   </div>
@@ -205,7 +209,7 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
 //   return await courseService.getAll({ params })
 // }
 
-async function fetchCourses({ query, sort, filterTopic }) {
+async function fetchCourses({ query, sort, filterTopic, filterLevel }) {
   const params = {
     'include': [
       'authors',
@@ -235,6 +239,16 @@ async function fetchCourses({ query, sort, filterTopic }) {
 
   if (typeof filterLevel === 'string') {
     params['filter[level]'] = filterTopic
+  }
+
+  if (filterLevel instanceof Map) {
+    let ids = []
+
+    for (let [key, value] of filterLevel) {
+      if (value) {ids.push(key)}
+    }
+
+    params['filter[level]'] = ids.join(',')
   }
 
   return await courseService.getAll({ params })
