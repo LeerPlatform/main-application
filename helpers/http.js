@@ -9,52 +9,52 @@ async function request(url, params, method = 'GET') {
     headers: {
       'Content-Type': 'application/json'
     }
-  };
+  }
 
   if (params) {
     if (method === 'GET') {
-      url += '?' + objectToQueryString(params);
+      url += '?' + objectToQueryString(params)
     } else {
-      options.body = JSON.stringify(params);
+      options.body = JSON.stringify(params)
     }
   }
 
-  const response = await fetch(`${_apiHost}/${_apiVersion}/${url}`, options);
+  const response = await fetch(`${_apiHost}/${_apiVersion}/${url}`, options)
 
   if (response.status !== 200) {
-    return generateErrorResponse('The server responded with an unexpected status.');
+    return generateErrorResponse('The server responded with an unexpected status.')
   }
 
-  const result = await response.json();
+  const result = await response.json()
 
-  return result;
+  return result
 }
 
 function objectToQueryString(obj) {
-  return Object.keys(obj).map(key => key + '=' + obj[key]).join('&');
+  return Object.keys(obj).map(key => key + '=' + obj[key]).join('&')
 }
 
 function generateErrorResponse(message) {
   return {
     status: 'error',
     message
-  };
+  }
 }
 
 function get(url, params) {
-  return request(url, params);
+  return request(url, params)
 }
 
 function create(url, params) {
-  return request(url, params, 'POST');
+  return request(url, params, 'POST')
 }
 
 function update(url, params) {
-  return request(url, params, 'PUT');
+  return request(url, params, 'PUT')
 }
 
 function remove(url, params) {
-  return request(url, params, 'DELETE');
+  return request(url, params, 'DELETE')
 }
 
 export default {
