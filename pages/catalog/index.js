@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import _ from 'lodash'
 import { useDidUpdateEffect, objectToQueryString } from '../../helpers'
-import { courseService, topicService } from '../../services'
+import { courseService, topicService, languageService } from '../../services'
 import MainLayout from '../../components/MainLayout'
 import SearchBar from '../../components/CatalogView/SearchBar'
 import ResultIndicator from '../../components/CatalogView/ResultIndicator'
 import ResultSorter from '../../components/CatalogView/ResultSorter'
 import CourseList from '../../components/CatalogView/CourseList'
+import TopicSelector from '../../components/CatalogView/Sidebar/TopicSelector'
 import Router from 'next/router'
 
   // useDidUpdateEffect(() => {
@@ -23,13 +24,16 @@ import Router from 'next/router'
   //   Router.push(`/catalog?${objectToQueryString(params)}`, undefined, { shallow: true })
   // }, [searchQuery, searchSort])
 
-function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initialMeta, topics }) {
+function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initialMeta, topics, languages }) {
+  // const isLoading
+
   // Search criteria
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery)
   const [searchSort, setSearchSort] = useState(initialSearchSort)
   const [searchFilterTopicId, setSearchFilterTopicId] = useState(null)
   // const [searchFilterLevels, setSearchFilterLevels] = useState(null)
   const [searchFilterLevels, setSearchFilterLevels] = useState(new Map())
+  const [searchFilterLanguageId, setSearchFilterLanguageId] = useState(null)
 
   // Result
   const [courses, setCourses] = useState(initialResult)
@@ -44,7 +48,7 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
 
   useDidUpdateEffect(() => {
     applySearch()
-  }, [searchQuery, searchSort, searchFilterTopicId, searchFilterLevels])
+  }, [searchQuery, searchSort, searchFilterTopicId, searchFilterLevels, searchFilterLanguageId])
 
   async function applySearch() {
     const { data, meta } = await fetchCourses({
@@ -52,6 +56,7 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
       sort: searchSort,
       filterTopic: searchFilterTopicId,
       filterLevel: searchFilterLevels,
+      filterLanguage: searchFilterLanguageId,
     })
 
     setCourses(data)
@@ -72,7 +77,12 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
   }
 
   function handleTopicFilterChange(event) {
+    console.log(event.target.value)
     setSearchFilterTopicId(event.target.value)
+  }
+
+  function handleLanguageFilterChange(event) {
+    setSearchFilterLanguageId(event.target.value)
   }
 
   function handleSelectedLevelChange(event) {
@@ -88,43 +98,17 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
         <div className="flex -mx-4">
           <div className="w-4/12 px-4">
 
-            <div>
-              <SearchBar
-                filterText={searchQuery}
-                onFilterTextChange={handleFilterTextChange}
-                onFilterTextEnter={handleFilterTextEnter}
-              />
-            </div>
+            <SearchBar
+              filterText={searchQuery}
+              onFilterTextChange={handleFilterTextChange}
+              onFilterTextEnter={handleFilterTextEnter}
+            />
 
-            <div className="mt-4">
-              <strong>Onderwerp</strong>
-
-              <div className="mt-3">
-                <div className="w-10/12 inline-block relative">
-                  <select
-                    className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow text-sm leading-tight focus:outline-none focus:shadow-outline"
-                    onChange={handleTopicFilterChange}
-                    defaultValue={searchFilterTopicId}
-                  >
-                    <option value={null}>Alle Onderwerpen</option>
-                    {topics.map(topic => (
-                      <option
-                        value={topic.id}
-                        key={topic.id}
-                      >
-                        {topic.display_name.nl}
-                      </option>
-                    ))}
-                  </select>
-
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <TopicSelector
+              topics={topics}
+              selectedTopicId={searchFilterTopicId}
+              onSelectedTopicChange={handleTopicFilterChange}
+            />
 
             <div className="mt-4">
               <strong>Niveau</strong>
@@ -144,6 +128,36 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
                     </label>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <strong>Taal</strong>
+
+              <div className="mt-3">
+                <div className="w-10/12 inline-block relative">
+                  <select
+                    className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow text-sm leading-tight focus:outline-none focus:shadow-outline"
+                    onChange={handleLanguageFilterChange}
+                    defaultValue={searchFilterLanguageId}
+                  >
+                    <option value={null}>Alle Talen</option>
+                    {languages.map(language => (
+                      <option
+                        value={language.id}
+                        key={language.id}
+                      >
+                        {language.display_name.nl}
+                      </option>
+                    ))}
+                  </select>
+
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                    </svg>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -182,6 +196,7 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
               </div>
             </div>
 
+            {}
             <CourseList
               courses={courses}
             />
@@ -209,7 +224,7 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
 //   return await courseService.getAll({ params })
 // }
 
-async function fetchCourses({ query, sort, filterTopic, filterLevel }) {
+async function fetchCourses({ query, sort, filterTopic, filterLevel, filterLanguage }) {
   const params = {
     'include': [
       'authors',
@@ -251,6 +266,10 @@ async function fetchCourses({ query, sort, filterTopic, filterLevel }) {
     params['filter[level]'] = ids.join(',')
   }
 
+  if (typeof filterLanguage === 'string') {
+    params['filter[language.id]'] = parseInt(filterLanguage)
+  }
+
   return await courseService.getAll({ params })
 }
 
@@ -260,6 +279,7 @@ export async function getServerSideProps(context) {
   const { data: initialResult, meta: initialMeta  } = await fetchCourses({ query: initialSearchQuery })
 
   const { data: topics } = await topicService.getAll({})
+  const { data: languages } = await languageService.getAll({})
 
   return {
     props: {
@@ -268,6 +288,7 @@ export async function getServerSideProps(context) {
       initialResult,
       initialMeta,
       topics,
+      languages,
     },
   }
 }
