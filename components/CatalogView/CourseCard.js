@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 export default function CourseCard({ course }) {
   return (
-    <div className="flex flex-wrap mb-4 bg-white border shadow-sm rounded-lg group" key={course.id.toString()}>
+    <div className="flex flex-wrap mb-4 bg-white border shadow-sm rounded-lg group">
       <div className="w-2/5 overflow-hidden rounded-l-lg">
         <Link href="/courses/[course]" as={`/courses/${course.slug}`}>
           <a className="hover:text-primary-blue">
@@ -19,12 +19,12 @@ export default function CourseCard({ course }) {
         </h2>
         <p className="mb-2 text-xs text-gray-600 font-medium">
           Door {course.authors.map((author, index) => (
-          <>
+          <React.Fragment key={author.id.toString()}>
             <Link href="/test">
               <a className="text-primary-blue hover:text-primary-blue-dark transition ease-out duration-500">{author.name}</a>
             </Link>
             {(course.authors.length - 1 !== index) && (course.authors.length - 2 !== index) ? ', ' : (course.authors.length - 2 === index) ? ' en ' : ''}
-          </>
+          </React.Fragment>
         ))}
         </p>
         <p className="text-sm">{course.description_excerpt.nl.slice(0, 150).trim()}{course.description_excerpt.nl.length > 150 ? '...' : ''}</p>
