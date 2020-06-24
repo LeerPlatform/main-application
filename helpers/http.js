@@ -3,12 +3,13 @@ import fetch from 'isomorphic-fetch'
 const _apiHost = 'http://api.leer-platform.test'
 const _apiVersion = 'v1'
 
-async function request(url, params, method = 'GET') {
+async function request(url, {params = {}, method = 'GET', init = {}}) {
   const options = {
     method,
     headers: {
       'Content-Type': 'application/json'
-    }
+    },
+    ...(init || {}),
   }
 
   if (params) {
@@ -25,9 +26,7 @@ async function request(url, params, method = 'GET') {
     return generateErrorResponse('The server responded with an unexpected status.')
   }
 
-  const result = await response.json()
-
-  return result
+  return await response.json()
 }
 
 function objectToQueryString(obj) {
@@ -41,23 +40,24 @@ function generateErrorResponse(message) {
   }
 }
 
-function get(url, params) {
-  return request(url, params)
+function get(url, params, init = {}) {
+  return request(url, { params, init })
 }
 
-function create(url, params) {
-  return request(url, params, 'POST')
+function create(url, params, init = {}) {
+  return request(url, { params, method: 'POST', init })
 }
 
-function update(url, params) {
-  return request(url, params, 'PUT')
+function update(url, params, init = {}) {
+  return request(url, { params, method: 'PUT', init })
 }
 
-function remove(url, params) {
-  return request(url, params, 'DELETE')
+function remove(url, params, init = {}) {
+  return request(url, { params, method: 'DELETE', init })
 }
 
 export default {
+  request,
   get,
   create,
   update,
