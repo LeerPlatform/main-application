@@ -9,7 +9,7 @@ async function request(url, {params = {}, method = 'GET', init = {}}) {
     headers: {
       'Content-Type': 'application/json'
     },
-    ...(init || {}),
+    ...init,
   }
 
   if (params) {
@@ -57,7 +57,6 @@ function remove(url, params, init = {}) {
 }
 
 export default {
-  request,
   get,
   create,
   update,

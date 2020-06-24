@@ -1,10 +1,8 @@
 import Http from '../helpers/http'
 
-async function getAll({ params }) {
-  return await Http.get('courses', params)
-  const { data } = await Http.get('courses', params)
-
-  return data
+function getAll(params = {}, init = {}) {
+  console.log(init)
+  return Http.get('courses', params, init)
 }
 
 export const courseService = {
