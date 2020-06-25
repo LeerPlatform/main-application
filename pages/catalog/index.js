@@ -1,89 +1,47 @@
 import { useState, useEffect } from 'react'
-import _ from 'lodash'
-import { useDidUpdateEffect, objectToQueryString } from '../../helpers'
+import { useDebouncedCallback } from 'use-debounce';
 import { courseService, topicService, languageService } from '../../services'
+import { isBrowser, useDidUpdateEffect } from '../../helpers'
+import SyncLoader from "react-spinners/SyncLoader";
 import MainLayout from '../../components/MainLayout'
+import CourseList from '../../components/CatalogView/CourseList'
 import SearchBar from '../../components/CatalogView/SearchBar'
+import TopicSelector from '../../components/CatalogView/Sidebar/TopicSelector'
+import LevelSelector from '../../components/CatalogView/Sidebar/LevelSelector'
+import LanguageSelector from '../../components/CatalogView/Sidebar/LanguageSelector'
 import ResultIndicator from '../../components/CatalogView/ResultIndicator'
 import ResultSorter from '../../components/CatalogView/ResultSorter'
-import CourseList from '../../components/CatalogView/CourseList'
-import TopicSelector from '../../components/CatalogView/Sidebar/TopicSelector'
-import Router from 'next/router'
+import { css } from "@emotion/core";
 
-  // useDidUpdateEffect(() => {
-  //   const params = {}
+var abortPreviousRequest
 
-  //   if (searchQuery) {
-  //     params['query'] = searchQuery
-  //   }
-
-  //   if (searchSort) {
-  //     params['sort'] = searchSort
-  //   }
-
-  //   Router.push(`/catalog?${objectToQueryString(params)}`, undefined, { shallow: true })
-  // }, [searchQuery, searchSort])
-
-function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initialMeta, topics, languages }) {
-  // const isLoading
+function Catalog({ initialSearchQuery, initialSearchSort, initialResults, initialResultsMeta, topics, languages }) {
+  // Search status
+  const [isLoading, setIsLoading] = useState(false)
 
   // Search criteria
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery)
   const [searchSort, setSearchSort] = useState(initialSearchSort)
-  const [searchFilterTopicId, setSearchFilterTopicId] = useState(null)
-  // const [searchFilterLevels, setSearchFilterLevels] = useState(null)
+  const [searchFilterTopicId, setSearchFilterTopicId] = useState('all_topics')
   const [searchFilterLevels, setSearchFilterLevels] = useState(new Map())
-  const [searchFilterLanguageId, setSearchFilterLanguageId] = useState(null)
+  const [searchFilterLanguageId, setSearchFilterLanguageId] = useState('all_languages')
 
-  // Result
-  const [courses, setCourses] = useState(initialResult)
-  const [currentSearchQuery, setCurrentSearchQuery] = useState(initialSearchQuery)
-  const [currentSearchResultCount, setCurrentSearchResultCount] = useState(initialMeta.total)
+  // Search results
+  const [courses, setCourses] = useState(initialResults)
+  const [lastSearchQuery, setLastSearchQuery] = useState(searchQuery)
+  const [resultsMeta, setResultsMeta] = useState(initialResultsMeta)
 
-  const levels = [
-    { id: 1, value: "0", title: 'Beginner' },
-    { id: 2, value: "1", title: 'Intermdiate'},
-    { id: 3, value: "2", title: 'Expert' },
-  ]
+  const override = css`
+    display: block;
+    margin: 0 auto;
+  `;
 
-  useDidUpdateEffect(() => {
-    applySearch()
-  }, [searchQuery, searchSort, searchFilterTopicId, searchFilterLevels, searchFilterLanguageId])
+  function handleFilterTextChange(filterText) { setSearchQuery(filterText) }
+  function handleFilterTextEnter() { searchCourses() }
 
-  async function applySearch() {
-    const { data, meta } = await fetchCourses({
-      query: searchQuery,
-      sort: searchSort,
-      filterTopic: searchFilterTopicId,
-      filterLevel: searchFilterLevels,
-      filterLanguage: searchFilterLanguageId,
-    })
+  function handleSelectedSortChange(value) { setSearchSort(value) }
 
-    setCourses(data)
-    setCurrentSearchQuery(searchQuery)
-    setCurrentSearchResultCount(meta.total)
-  }
-
-  function handleFilterTextChange(filterText) {
-    setSearchQuery(filterText)
-  }
-
-  function handleFilterTextEnter() {
-    applySearch()
-  }
-
-  function handleSelectedSortChange(value) {
-    setSearchSort(value)
-  }
-
-  function handleTopicFilterChange(event) {
-    console.log(event.target.value)
-    setSearchFilterTopicId(event.target.value)
-  }
-
-  function handleLanguageFilterChange(event) {
-    setSearchFilterLanguageId(event.target.value)
-  }
+  function handleTopicFilterChange(event) { setSearchFilterTopicId(event.target.value) }
 
   function handleSelectedLevelChange(event) {
     const item = event.target.value
@@ -92,10 +50,61 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
     setSearchFilterLevels(new Map(searchFilterLevels.set(item, isChecked)))
   }
 
+  function handleLanguageFilterChange(event) { setSearchFilterLanguageId(event.target.value) }
+
+  // Search courses based on criteria
+  async function searchCourses() {
+    if (!isBrowser) {
+      throw 'This method requires the window object.'
+    }
+
+    setIsLoading(true)
+
+    if (abortPreviousRequest !== undefined) {
+      abortPreviousRequest()
+    }
+
+    const controller = new AbortController()
+    const signal = controller.signal
+    abortPreviousRequest = controller.abort.bind(controller)
+
+    // console.log('searchFilterTopicId: ' + searchFilterTopicId + ' (' + typeof searchFilterTopicId)
+
+    const {
+      data,
+      meta
+    } = await fetchCourses({
+      searchQuery,
+      sort: searchSort,
+      ...(typeof searchFilterTopicId === 'string' && searchFilterTopicId !== 'all_topics' ? { filterTopic: parseInt(searchFilterTopicId) } : {}),
+      filterLevel: searchFilterLevels,
+      filterLanguage: searchFilterLanguageId,
+      ...(typeof searchFilterLanguageId === 'string' && searchFilterLanguageId !== 'all_languages' ? { filterLanguage: parseInt(searchFilterLanguageId) } : {}),
+    }, signal)
+
+    setCourses(data)
+    setLastSearchQuery(searchQuery)
+    setResultsMeta(meta)
+
+    setIsLoading(false)
+  }
+
+  const [debouncedSearchCourses] = useDebouncedCallback(
+    () => {
+      searchCourses()
+    },
+    1000
+  )
+
+  useDidUpdateEffect(() => {
+    debouncedSearchCourses()
+  }, [searchQuery, searchSort, searchFilterTopicId, searchFilterLevels, searchFilterLanguageId])
+
   return (
     <MainLayout>
       <div className="container mx-auto px-4 py-8">
         <div className="flex -mx-4">
+
           <div className="w-4/12 px-4">
 
             <SearchBar
@@ -110,71 +119,16 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
               onSelectedTopicChange={handleTopicFilterChange}
             />
 
-            <div className="mt-4">
-              <strong>Niveau</strong>
+            <LevelSelector
+              selectedLevels={searchFilterLevels}
+              onSelectedLevelsChange={handleSelectedLevelChange}
+            />
 
-              <div>
-                {levels.map(level => (
-                  <div className="hover:bg-white py-2" key={level.id}>
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        value={level.value}
-                        checked={!!searchFilterLevels.get(level.value)}
-                        onChange={handleSelectedLevelChange}
-                        className="mr-2"
-                      />
-                      <span>{level.title}</span>
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="mt-4">
-              <strong>Taal</strong>
-
-              <div className="mt-3">
-                <div className="w-10/12 inline-block relative">
-                  <select
-                    className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow text-sm leading-tight focus:outline-none focus:shadow-outline"
-                    onChange={handleLanguageFilterChange}
-                    defaultValue={searchFilterLanguageId}
-                  >
-                    <option value={null}>Alle Talen</option>
-                    {languages.map(language => (
-                      <option
-                        value={language.id}
-                        key={language.id}
-                      >
-                        {language.display_name.nl}
-                      </option>
-                    ))}
-                  </select>
-
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* <div className="mt-4">
-              <strong>Niveau</strong>
-
-              <div>
-                {topics.map(topic => (
-                  <div className="hover:bg-white py-2">
-                    <label className="flex items-center">
-                      <input type="checkbox" value={topic.display_name.nl} className="mr-2" />
-                      <span>{topic.display_name.nl}</span>
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div> */}
+            <LanguageSelector
+              languages={languages}
+              selectedLanguageId={searchFilterLanguageId}
+              onSelectedLanguageChange={handleLanguageFilterChange}
+            />
 
           </div>
 
@@ -183,8 +137,8 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
             <div className="flex justify-between py-2 mb-4">
               <div>
                 <ResultIndicator
-                  totalResultsCount={currentSearchResultCount}
-                  searchTerms={currentSearchQuery}
+                  totalResultsCount={resultsMeta.total}
+                  searchTerms={lastSearchQuery}
                 />
               </div>
 
@@ -196,35 +150,56 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResult, initial
               </div>
             </div>
 
-            {}
-            <CourseList
-              courses={courses}
-            />
+            {/* <button className="bg-white py-4 px-2 border mb-4" onClick={() => { setIsLoading(!isLoading)}}>Turn loading screen on</button> */}
+
+            <div className="relative">
+
+              {courses && <CourseList courses={courses} />}
+
+              {isLoading && (
+                <div className="absolute bg-white opacity-75 inset-0 z-50">
+                  <SyncLoader
+                    css={override}
+                    size={20}
+                    color={"#333"}
+                    loading={isLoading}
+                  />
+                </div>
+              )}
+            </div>
 
           </div>
+
         </div>
       </div>
     </MainLayout>
   )
 }
 
-// async function fetchResults(filters = [], sort, page) {
-//   constParams = {
-//     'include': [
-//       'authors',
-//       'tags',
-//       'language',
-//       'studentsCount'
-//     ],
-//     'page[size]': 16,
-//   }
+export async function getServerSideProps(context) {
+  const initialSearchQuery = context.query?.query ?? ''
+  const initialSearchSort = context.query?.sort ?? 'popular_all_time'
+  const {
+    data: initialResults,
+    meta: initialResultsMeta
+  } = await fetchCourses({ searchQuery: initialSearchQuery })
 
-//   filters
+  const { data: topics } = await topicService.getAll({})
+  const { data: languages } = await languageService.getAll({})
 
-//   return await courseService.getAll({ params })
-// }
+  return {
+    props: {
+      initialSearchQuery,
+      initialSearchSort,
+      initialResults,
+      initialResultsMeta,
+      topics,
+      languages,
+    },
+  }
+}
 
-async function fetchCourses({ query, sort, filterTopic, filterLevel, filterLanguage }) {
+async function fetchCourses({ searchQuery, sort, filterTopic, filterLevel, filterLanguage }, signal) {
   const params = {
     'include': [
       'authors',
@@ -235,8 +210,8 @@ async function fetchCourses({ query, sort, filterTopic, filterLevel, filterLangu
     'page[size]': 16,
   }
 
-  if (typeof query === 'string') {
-    params['filter[query]'] = query
+  if (typeof searchQuery === 'string' && searchQuery.length > 0) {
+    params['filter[query]'] = searchQuery
   }
 
   if (typeof sort === 'string') {
@@ -245,52 +220,32 @@ async function fetchCourses({ query, sort, filterTopic, filterLevel, filterLangu
       'latest': '-created_at',
     }
 
-    params['sort'] = sorts[sort] ?? '-popular'
+    const defaultSort = sorts['popular_all_time']
+
+    params['sort'] = sorts[sort] ?? defaultSort
   }
 
-  if (typeof filterTopic === 'string') {
-    params['filter[topic.id]'] = parseInt(filterTopic)
-  }
-
-  if (typeof filterLevel === 'string') {
-    params['filter[level]'] = filterTopic
+  if (typeof filterTopic === 'number') {
+    params['filter[topic.id]'] = filterTopic
   }
 
   if (filterLevel instanceof Map) {
     let ids = []
 
     for (let [key, value] of filterLevel) {
-      if (value) {ids.push(key)}
+      if (value) { ids.push(key) }
     }
 
-    params['filter[level]'] = ids.join(',')
+    if (ids.length > 0) {
+      params['filter[level]'] = ids
+    }
   }
 
-  if (typeof filterLanguage === 'string') {
-    params['filter[language.id]'] = parseInt(filterLanguage)
+  if (typeof filterLanguage === 'number') {
+    params['filter[language.id]'] = filterLanguage
   }
 
-  return await courseService.getAll({ params })
-}
-
-export async function getServerSideProps(context) {
-  const initialSearchQuery = context.query?.query ?? ''
-  const initialSearchSort = context.query?.sort ?? 'popular_all_time'
-  const { data: initialResult, meta: initialMeta  } = await fetchCourses({ query: initialSearchQuery })
-
-  const { data: topics } = await topicService.getAll({})
-  const { data: languages } = await languageService.getAll({})
-
-  return {
-    props: {
-      initialSearchQuery,
-      initialSearchSort,
-      initialResult,
-      initialMeta,
-      topics,
-      languages,
-    },
-  }
+  return await courseService.getAll(params, { signal })
 }
 
 export default Catalog
