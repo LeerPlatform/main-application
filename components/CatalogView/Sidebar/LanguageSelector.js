@@ -10,7 +10,7 @@ export default function LanguageSelector({ languages, selectedLanguageId, onSele
             onChange={onSelectedLanguageChange}
             defaultValue={selectedLanguageId}
           >
-            <option key={'all_topics'} value={null}>Alle Talen</option>
+            <option key={'all_topics'} value="all_languages">Alle Talen</option>
             {languages.map(language => (
               <option
                 value={language.id}
