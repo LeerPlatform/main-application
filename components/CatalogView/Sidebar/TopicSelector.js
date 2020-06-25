@@ -10,7 +10,7 @@ export default function TopicSelector({ topics, selectedTopicId, onSelectedTopic
             onChange={onSelectedTopicChange}
             defaultValue={selectedTopicId}
           >
-            <option key={'all_topics'} value={null}>Alle Onderwerpen</option>
+            <option key={'all_topics'} value="all_topics">Alle Onderwerpen</option>
             {topics.map(topic => (
               <option
                 value={topic.id}
