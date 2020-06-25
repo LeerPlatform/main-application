@@ -164,10 +164,10 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResults, initia
                     <BeatLoader
                       css={css`display: block;margin: 0 auto;`}
                       size={20}
-                    color={"#333"}
-                    loading={isLoading}
-                  />
-                </div>
+                      color={"#1089ff"}
+                      loading={isLoading}
+                    />
+                  </div>
               )}
             </div>
 
