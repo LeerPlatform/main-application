@@ -157,10 +157,13 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResults, initia
               {courses && <CourseList courses={courses} />}
 
               {isLoading && (
-                <div className="absolute bg-white opacity-75 inset-0 z-50">
-                  <SyncLoader
-                    css={override}
-                    size={20}
+                <>
+                  <div className="absolute bg-white opacity-75 inset-0 z-50"></div>
+
+                  <div className="absolute inset-0 z-50 flex mt-48">
+                    <BeatLoader
+                      css={css`display: block;margin: 0 auto;`}
+                      size={20}
                     color={"#333"}
                     loading={isLoading}
                   />
