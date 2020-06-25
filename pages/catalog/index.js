@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useDebouncedCallback } from 'use-debounce';
 import { courseService, topicService, languageService } from '../../services'
 import { isBrowser, useDidUpdateEffect } from '../../helpers'
-import SyncLoader from "react-spinners/SyncLoader";
+import BeatLoader from "react-spinners/BeatLoader";
 import MainLayout from '../../components/MainLayout'
 import CourseList from '../../components/CatalogView/CourseList'
 import SearchBar from '../../components/CatalogView/SearchBar'
@@ -15,7 +15,7 @@ import { css } from "@emotion/core";
 
 var abortPreviousRequest
 
-function Catalog({ initialSearchQuery, initialSearchSort, initialResults, initialResultsMeta, topics, languages }) {
+function Catalog({ initialSearchQuery, initialSearchSort, initialPageNumber, initialResults, initialResultsMeta, topics, languages }) {
   // Search status
   const [isLoading, setIsLoading] = useState(false)
 
@@ -25,16 +25,12 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResults, initia
   const [searchFilterTopicId, setSearchFilterTopicId] = useState('all_topics')
   const [searchFilterLevels, setSearchFilterLevels] = useState(new Map())
   const [searchFilterLanguageId, setSearchFilterLanguageId] = useState('all_languages')
+  const [pageNumber, setPageNumber] = useState(initialPageNumber)
 
   // Search results
   const [courses, setCourses] = useState(initialResults)
   const [lastSearchQuery, setLastSearchQuery] = useState(searchQuery)
   const [resultsMeta, setResultsMeta] = useState(initialResultsMeta)
-
-  const override = css`
-    display: block;
-    margin: 0 auto;
-  `;
 
   function handleFilterTextChange(filterText) { setSearchQuery(filterText) }
   function handleFilterTextEnter() { searchCourses() }
@@ -68,8 +64,6 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResults, initia
     const signal = controller.signal
     abortPreviousRequest = controller.abort.bind(controller)
 
-    // console.log('searchFilterTopicId: ' + searchFilterTopicId + ' (' + typeof searchFilterTopicId)
-
     const {
       data,
       meta
@@ -80,6 +74,7 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResults, initia
       filterLevel: searchFilterLevels,
       filterLanguage: searchFilterLanguageId,
       ...(typeof searchFilterLanguageId === 'string' && searchFilterLanguageId !== 'all_languages' ? { filterLanguage: parseInt(searchFilterLanguageId) } : {}),
+      pageNumber,
     }, signal)
 
     setCourses(data)
@@ -98,7 +93,7 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResults, initia
 
   useDidUpdateEffect(() => {
     debouncedSearchCourses()
-  }, [searchQuery, searchSort, searchFilterTopicId, searchFilterLevels, searchFilterLanguageId])
+  }, [searchQuery, searchSort, searchFilterTopicId, searchFilterLevels, searchFilterLanguageId, pageNumber])
 
   return (
     <MainLayout>
@@ -137,7 +132,7 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResults, initia
             <div className="flex justify-between py-2 mb-4">
               <div>
                 <ResultIndicator
-                  totalResultsCount={resultsMeta.total}
+                  totalResultsCount={courses.length}
                   searchTerms={lastSearchQuery}
                 />
               </div>
@@ -168,6 +163,7 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResults, initia
                       loading={isLoading}
                     />
                   </div>
+                </>
               )}
             </div>
 
@@ -182,6 +178,7 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialResults, initia
 export async function getServerSideProps(context) {
   const initialSearchQuery = context.query?.query ?? ''
   const initialSearchSort = context.query?.sort ?? 'popular_all_time'
+  const initialPageNumber = 1
   const {
     data: initialResults,
     meta: initialResultsMeta
@@ -194,6 +191,7 @@ export async function getServerSideProps(context) {
     props: {
       initialSearchQuery,
       initialSearchSort,
+      initialPageNumber,
       initialResults,
       initialResultsMeta,
       topics,
@@ -202,7 +200,7 @@ export async function getServerSideProps(context) {
   }
 }
 
-async function fetchCourses({ searchQuery, sort, filterTopic, filterLevel, filterLanguage }, signal) {
+async function fetchCourses({ searchQuery, sort, filterTopic, filterLevel, filterLanguage, pageNumber }, signal) {
   const params = {
     'include': [
       'authors',
@@ -246,6 +244,10 @@ async function fetchCourses({ searchQuery, sort, filterTopic, filterLevel, filte
 
   if (typeof filterLanguage === 'number') {
     params['filter[language.id]'] = filterLanguage
+  }
+
+  if (typeof pageNumber === 'number') {
+    params['page[number]'] = pageNumber
   }
 
   return await courseService.getAll(params, { signal })
