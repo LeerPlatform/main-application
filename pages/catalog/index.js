@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useDebouncedCallback } from 'use-debounce';
 import { courseService, topicService, languageService } from '../../services'
 import { isBrowser, useDidUpdateEffect } from '../../helpers'
-import BeatLoader from "react-spinners/BeatLoader";
+// import BeatLoader from "react-spinners/BeatLoader";
 import MainLayout from '../../components/MainLayout'
 import CourseList from '../../components/CatalogView/CourseList'
 import SearchBar from '../../components/CatalogView/SearchBar'
@@ -11,7 +11,7 @@ import LevelSelector from '../../components/CatalogView/Sidebar/LevelSelector'
 import LanguageSelector from '../../components/CatalogView/Sidebar/LanguageSelector'
 import ResultIndicator from '../../components/CatalogView/ResultIndicator'
 import ResultSorter from '../../components/CatalogView/ResultSorter'
-import { css } from "@emotion/core";
+// import { css } from "@emotion/core";
 
 var abortPreviousRequest
 
@@ -156,12 +156,12 @@ function Catalog({ initialSearchQuery, initialSearchSort, initialPageNumber, ini
                   <div className="absolute bg-white opacity-75 inset-0 z-50"></div>
 
                   <div className="absolute inset-0 z-50 flex mt-48">
-                    <BeatLoader
+                    {/* <BeatLoader
                       css={css`display: block;margin: 0 auto;`}
                       size={20}
                       color={"#1089ff"}
                       loading={isLoading}
-                    />
+                    /> */}
                   </div>
                 </>
               )}
