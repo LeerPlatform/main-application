@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch'
 
-const _apiHost = 'http://api.leer-platform.test'
+const _apiHost = 'http://api.leerplatform.test'
 const _apiVersion = 'v1'
 
 async function request(url, {params = {}, method = 'GET', init = {}}) {
