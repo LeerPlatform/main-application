@@ -10,7 +10,7 @@
   "dependencies": {
     "es6-promise": "^4.2.8",
     "isomorphic-fetch": "^2.2.1",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "next": "11.1.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
